@@ -1804,7 +1804,6 @@ CREATE INDEX idx_contentlet_4 ON contentlet (structure_inode);
 CREATE INDEX idx_contentlet_identifier ON contentlet (identifier);
 
 ALTER TABLE Folder add constraint folder_identifier_fk foreign key (identifier) references identifier(id);
---ALTER TABLE dot_containers add constraint structure_fk foreign key (structure_inode) references structure(inode);
 
 delimiter #
 CREATE TRIGGER folder_identifier_check AFTER DELETE
@@ -1866,7 +1865,7 @@ CLOSE cur1;
 END
 #
 
-DROP TRIGGER IF EXISTS rename_folder_assets_trigger;
+
 CREATE TRIGGER rename_folder_assets_trigger AFTER UPDATE
 on Folder
 FOR EACH ROW
@@ -2201,7 +2200,7 @@ alter table htmlpages_ir add constraint FK_page_ir_ep foreign key (endpoint_id) 
 alter table fileassets_ir add constraint FK_file_ir_ep foreign key (endpoint_id) references publishing_end_point(id);
 alter table cms_roles_ir add constraint FK_cms_roles_ir_ep foreign key (endpoint_id) references publishing_end_point(id);
 
----Server Action
+-- Server Action
 create table cluster_server_action(
     server_action_id varchar(36) not null, 
     originator_id varchar(36) not null, 
@@ -2238,14 +2237,53 @@ CREATE INDEX idx_system_event ON system_event (created);
 CREATE TABLE `db_version` (`db_version` INTEGER UNSIGNED NOT NULL,`date_update` DATETIME NOT NULL, PRIMARY KEY (`db_version`));
 
 create table AdminConfig (
-	configId varchar(100) not null primary key,
-	companyId varchar(100) not null,
-	type_ varchar(100) null,
-	name varchar(100) null,
-	config longtext null
+  configId varchar(100) not null primary key,
+  companyId varchar(100) not null,
+  type_ varchar(100) null,
+  name varchar(100) null,
+  config longtext null
 );
 
+create table Counter (
+    name NVARCHAR(100) not null primary key,
+    currentId int
+);
 
+create table PollsChoice (
+    choiceId NVARCHAR(100) not null,
+    questionId NVARCHAR(100) not null,
+    description NVARCHAR(1000) null,
+    primary key (choiceId, questionId)
+);
 
+create table PollsDisplay (
+    layoutId NVARCHAR(100) not null,
+    userId NVARCHAR(100) not null,
+    portletId NVARCHAR(100) not null,
+    questionId NVARCHAR(100) not null,
+    primary key (layoutId, userId, portletId)
+);
 
+create table PollsQuestion (
+    questionId NVARCHAR(100) not null primary key,
+    portletId NVARCHAR(100) not null,
+    groupId NVARCHAR(100) not null,
+    companyId NVARCHAR(100) not null,
+    userId NVARCHAR(100) not null,
+    userName NVARCHAR(100) null,
+    createDate datetime null,
+    modifiedDate datetime null,
+    title NVARCHAR(100) null,
+    description NVARCHAR(1000) null,
+    expirationDate datetime null,
+    lastVoteDate datetime null
+);
+
+create table PollsVote (
+    questionId NVARCHAR(100) not null,
+    userId NVARCHAR(100) not null,
+    choiceId NVARCHAR(100) not null,
+    voteDate datetime null,
+    primary key (questionId, userId)
+);
 
